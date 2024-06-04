@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    
+        <!-- Navbar & Hero Start -->
+        <div class="container-fluid position-relative p-0">
+            <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
+                <a href="/" class="navbar-brand p-0">
+                    <h1 class="m-0">AES-256</h1>
+                    <!-- <img src="img/logo.png" alt="Logo"> -->
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <div class="navbar-nav ms-auto py-0">
+                        <a href="/" class="nav-item nav-link">Bosh saxifa</a>
+                        <a href="{% url 'shifrlash' %}" class="nav-item nav-link">Shifirlash</a>
+                        <a href="{% url 'deshifrlash' %}" class="nav-item nav-link">Deshifrlash</a>
+                        <a href="{% url 'edit' %}" class="nav-item nav-link ">O'zgartirish</a>
+                        <a href="{% url 'delete' %}" class="nav-item nav-link">O'chirish</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <!-- Navbar & Hero End -->
+
+        <!-- Header Start -->
+        <div class="container-fluid bg-breadcrumb">
+            <div class="container text-center py-5">
+                <div class="row">
+                <div class="col-lg-6">
+                    <h3 class="mb-2 text-white">Shifrlash</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="first_name" class="form-control border-0" id="name" placeholder="Ism">
+                                    <label for="name" >Ism</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" name="last_name" class="form-control border-0" id="text_Familiya" placeholder="Familiya">
+                                    <label for="text_Familiya">Familiya</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control border-0" name="text" placeholder="Leave a message here" id="message" style="height: 160px"></textarea>
+                                    <label for="message">Ma'lumot</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 py-3" type="submit">Shifirlash</button>
+                            </div>
+                        </div>
+                    </form>                    
+                </div>  
+                <div class="col-lg-6">
+                    <h1 class="text-white mb-3">Bazaga saqlangan ma'lumotlar</h1>
+                    <div class="table-container">
+                        <table id="customers">
+                            <tr>
+                              <th>Ism</th>
+                              <th>Familiya</th>
+                              <th>Ma'lumot</th>
+                            </tr>
+                            {% for shifr in shifrlar %}
+                            <tr>
+                              <td>{{shifr.first_name}}</td>
+                              <td>{{shifr.last_name}}</td>
+                              <td>{{shifr.encrypted_text}}</td>    
+                            </tr>
+                            {% endfor %}
+                          </table>
+                    </div>
+                    
+                </div> 
+                </div>
+            </div>
+        </div>
+        <!-- Header End -->
+
+
+        {% endblock content %}

@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    #customers {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    #customers td, #customers th {
+        border: 1px solid #ddd;
+        padding: 8px;
+        word-wrap: break-word;
+        max-width: 300px;
+    }
+
+    #customers tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    #customers tr:hover {
+        background-color: #ddd;
+    }
+
+    #customers th {
+        text-align: center;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        background-color: #464647;
+        color: rgb(255, 255, 255);
+    }
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var shifrlar = JSON.parse('{{ shifrlar_json|escapejs }}');
+
+        $('#first_name').change(function() {
+            var selectedFirstName = $(this).val();
+            var lastNameSelect = $('#last_name');
+            lastNameSelect.empty();
+            lastNameSelect.append('<option value="">Familiya tanlang</option>');
+
+            $.each(shifrlar, function(index, shifr) {
+                if (shifr.first_name === selectedFirstName) {
+                    lastNameSelect.append('<option value="' + shifr.last_name + '">' + shifr.last_name + '</option>');
+                }
+            });
+        });
+    });
+</script>
+
+<!-- Navbar & Hero Start -->
+<div class="container-fluid position-relative p-0">
+    <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
+        <a href="/" class="navbar-brand p-0">
+            <h1 class="m-0">AES-256</h1>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="fa fa-bars"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto py-0">
+                <a href="/" class="nav-item nav-link">Bosh saxifa</a>
+                <a href="{% url 'shifrlash' %}" class="nav-item nav-link">Shifirlash</a>
+                <a href="{% url 'deshifrlash' %}" class="nav-item nav-link">Deshifrlash</a>
+                <a href="{% url 'edit' %}" class="nav-item nav-link ">O'zgartirish</a>
+                <a href="{% url 'delete' %}" class="nav-item nav-link">O'chirish</a>
+            </div>
+        </div>
+    </nav>
+</div>
+<!-- Navbar & Hero End -->
+
+<!-- Header Start -->
+<div class="container-fluid bg-breadcrumb">
+    <div class="container text-center py-5">
+        <div class="row">
+            <div class="col-lg-6">
+                <h1 class="text-white mb-3">Deshifrlash</h1>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <select name="first_name" class="form-control border-0" id="first_name">
+                                    <option value="">Ism tanlang</option>
+                                    {% for shifr in shifrlar %}
+                                        <option value="{{ shifr.first_name }}">{{ shifr.first_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="first_name">Ism</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <select name="last_name" class="form-control border-0" id="last_name">
+                                    <option value="">Familiya tanlang</option>
+                                </select>
+                                <label for="last_name">Familiya</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary w-100 py-3" type="submit">Deshifrlash</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <h1 class="text-white mb-3">Deshifrlangan ma'lumotlar</h1>
+                {% if decrypted_texts %}
+                <div class="table-container">
+                    <table id="customers">
+                        <tr>
+                            <th>Ism</th>
+                            <th>Familiya</th>
+                            <th>Shifrlangan ma'lumot</th>
+                        </tr>
+                        {% for decrypted_text in decrypted_texts %}
+                        <tr>
+                            <td>{{ first_name }}</td>
+                            <td>{{ last_name }}</td>
+                            <td>{{ decrypted_text }}</td>    
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>  
+    </div>
+</div>
+<!-- Header End -->
+
+{% endblock content %}

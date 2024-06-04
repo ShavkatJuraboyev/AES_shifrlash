@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var shifrlar = JSON.parse('{{ shifrlar_json|escapejs }}');
+
+        $('#first_name').change(function() {
+            var selectedFirstName = $(this).val();
+            var lastNameSelect = $('#last_name');
+            lastNameSelect.empty();
+            lastNameSelect.append('<option value="">Familiya tanlang</option>');
+
+            $.each(shifrlar, function(index, shifr) {
+                if (shifr.first_name === selectedFirstName) {
+                    lastNameSelect.append('<option value="' + shifr.last_name + '">' + shifr.last_name + '</option>');
+                }
+            });
+        });
+    });
+</script>
+
+<div class="container-fluid position-relative p-0">
+    <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
+        <a href="/" class="navbar-brand p-0">
+            <h1 class="m-0">AES-256</h1>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="fa fa-bars"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto py-0">
+                <a href="/" class="nav-item nav-link">Bosh saxifa</a>
+                <a href="{% url 'shifrlash' %}" class="nav-item nav-link">Shifirlash</a>
+                <a href="{% url 'deshifrlash' %}" class="nav-item nav-link">Deshifrlash</a>
+                <a href="{% url 'edit' %}" class="nav-item nav-link">O'zgartirish</a>
+                <a href="{% url 'delete' %}" class="nav-item nav-link">O'chirish</a>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<div class="container-fluid bg-breadcrumb">
+    <div class="container text-center py-5">
+        <div class="row">
+            <div class="col-lg-6">
+                <h1 class="text-white mb-3">Ma'lumotlarni o'zgartirish</h1>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <select name="first_name" class="form-control border-0" id="first_name">
+                                    <option value="">Ism tanlang</option>
+                                    {% for user in user_texts %}
+                                        <option value="{{ user.first_name }}">{{ user.first_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="first_name">Ism</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating">
+                                <select name="last_name" class="form-control border-0" id="last_name">
+                                    <option value="">Familiya tanlang</option>
+                                </select>
+                                <label for="last_name">Familiya</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary w-100 py-3" type="submit" name="search">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-6">
+                
+                {% if search_results %}
+                    <h2 class="text-white mb-3">Matching Results</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <select name="user_text_id" class="form-control border-0">
+                                    {% for result in search_results %}
+                                        <option value="{{ result.id }}">{{ result.first_name }} {{ result.last_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="user_text_id">Select Entry</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary w-100 py-3" type="submit" name="select">Select</button>
+                        </div>
+                    </form>
+                {% endif %}
+                
+                {% if update_form %}
+                <h2 class="text-white mb-3">Update Text for {{ user_text.first_name }} {{ user_text.last_name }}</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_text_id" value="{{ user_text.id }}">
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <textarea class="form-control border-0" name="encrypted_text" placeholder="Leave a message here" id="message" style="height: 160px">{{ update_form.initial.encrypted_text }}</textarea>
+                            <label for="message">Ma'lumot</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary w-100 py-3" type="submit" name="update">O'zgartirish</button>
+                    </div>
+                </form>
+            {% endif %}
+            </div>
+            <div class="col-lg-6">
+                <h1 class="text-white mb-3">Bazaga saqlangan ma'lumotlar</h1>
+                <div class="table-container">
+                    <table id="customers">
+                        <tr>
+                            <th>Ism</th>
+                            <th>Familiya</th>
+                            <th>Shifrlangan ma'lumot</th>
+                        </tr>
+                        {% for user in user_texts %}
+                        <tr>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.last_name }}</td>
+                            <td>{{ user.encrypted_text }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
